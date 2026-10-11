@@ -1,0 +1,10 @@
+.timeline-filters {display:flex;align-items:end;gap:12px;flex-wrap:wrap;padding:14px 30px;background:#fff;border-bottom:1px solid #e5eaf2;}
+.timeline-filters label {display:flex;flex-direction:column;gap:5px;font-size:11px;color:#687b91;}
+.timeline-filters input,.timeline-filters select,.timeline-filters button {font:inherit;font-size:12px;padding:8px 10px;border:1px solid #dce4ef;border-radius:9px;background:white;color:#344c69;}
+.timeline-filters button {color:#286fc6;}.timeline-filters small {font-size:11px;color:#71839a;}
+.timeline-day {margin:0;font-size:17px;font-weight:650;color:#314863;display:flex;align-items:center;gap:10px;height:44px;}
+.timeline-day small {font-size:11px;font-weight:400;color:#8290a1;}
+.timeline-position {position:fixed;right:22px;bottom:22px;background:#263b55e8;color:#fff;border-radius:20px;padding:9px 15px;font-size:12px;z-index:20;pointer-events:none;}
+.capture-index-status {padding:8px 30px;font-size:11px;color:#71839a;background:#f2f6fc;}
+.timeline-row {position:absolute;left:0;right:0;}
+@media(max-width:560px){.timeline-filters{padding:12px 16px;gap:8px;}.timeline-filters label{flex:1;min-width:100px;}.timeline-position{right:12px;bottom:12px;}.timeline-day{font-size:14px;}}

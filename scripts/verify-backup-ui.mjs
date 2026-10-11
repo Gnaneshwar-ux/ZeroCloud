@@ -1,0 +1,57 @@
+import assert from 'node:assert/strict'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import {createRequire} from 'node:module'
+const root=path.resolve(process.argv[2]),work=path.resolve(process.argv[3]);await fs.mkdir(work,{recursive:true})
+const require=createRequire(path.join(root,'package.json')), {_electron:electron}=require('playwright')
+const source=path.join(work,'sources'),vault=path.join(work,'vault');await fs.mkdir(source,{recursive:true});await fs.mkdir(vault,{recursive:true})
+await fs.writeFile(path.join(source,'report.txt'),'Verified report contents');await fs.writeFile(path.join(source,'renamed.txt'),'Verified report contents');await fs.writeFile(path.join(source,'recording.mp3'),'Verification-only audio bytes')
+let app
+try {
+  app=await electron.launch({executablePath:process.env.VELA_EXECUTABLE||path.join(root,'node_modules/electron/dist/electron.exe'),args:process.env.VELA_PACKAGED==='1'?[]:[path.join(root,'desktop/main.cjs')],env:{...process.env,VELA_TEST:'1',VELA_DATA:path.join(work,'media-catalog'),VELA_USER_DATA:path.join(work,'profile'),VELA_BACKUP_STATE:path.join(work,'backup-state'),VELA_TEST_PICK:path.join(work,'moved-state')},timeout:60000})
+  const page=await app.firstWindow();const errors=[];page.on('pageerror',error=>errors.push(error.message));await page.getByRole('button',{name:'Add folder',exact:true}).first().waitFor();await page.waitForLoadState('load');await page.addInitScript(()=>Object.defineProperty(document,'hidden',{get:()=>false}));await page.reload();await page.setViewportSize({width:1440,height:960})
+  const snapshot=async(name)=>{const size=page.viewportSize();await app.evaluate(({BrowserWindow},size)=>{const window=BrowserWindow.getAllWindows()[0];window.setContentSize(size.width,size.height);window.showInactive()},size);try{await page.waitForTimeout(300);await page.screenshot({path:path.join(work,name),timeout:15000})}finally{await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].hide())}}
+  const api=(op,args={})=>page.evaluate(({op,args})=>window.velaDesktop.request(`backup:${op}`,args),{op,args})
+  const waitForState=async(predicate)=>{const deadline=Date.now()+30000;let state;while(Date.now()<deadline){state=await api('overview');if(predicate(state))return state;await new Promise(resolve=>setTimeout(resolve,200))}throw new Error(`Timed out waiting for actual job state: ${JSON.stringify(state)}`)}
+  await page.getByRole('button',{name:'Backup & protect',exact:true}).click()
+  await page.getByRole('heading',{name:'Backup & protect',exact:true}).waitFor()
+  assert.equal(await page.locator('.stats-grid:visible').count(),0,'Media counters must not overload Backup')
+  await snapshot('overview.png')
+  await page.getByRole('button',{name:'New backup',exact:true}).click();await page.getByRole('textbox',{name:'Backup source paths'}).fill(source);await page.getByRole('button',{name:'Scan selected sources',exact:true}).click()
+  await page.getByRole('heading',{name:'Select files and folders'}).waitFor({timeout:30000})
+  await page.getByRole('button',{name:'Choose destination',exact:true}).click();await page.getByRole('textbox',{name:'Backup destination',exact:true}).fill(vault)
+  await page.getByRole('button',{name:'Prepare backup plan',exact:true}).click();await page.getByRole('button',{name:'Start verified backup',exact:true}).waitFor();await snapshot('plan.png')
+  assert.equal((await fs.readdir(vault)).length,0,'Planning must not copy files')
+  await page.getByRole('button',{name:'Start verified backup',exact:true}).click()
+  await waitForState(state=>!state.active&&state.jobs[0]?.status==='completed')
+  let state=await api('overview');const job=state.jobs[0];assert.equal(job.copied_files,2);assert.equal(job.skipped_files,1);assert.equal((await fs.readdir(source)).length,3)
+  console.log('PASS guided UI: source inventory, category selection, dedicated workspace, preview-before-copy, verified copy and exact-name-independent dedup; sources kept')
+  await page.getByRole('button',{name:'Search backups',exact:true}).click();await page.getByRole('textbox',{name:'Search backup files'}).fill('rport');await page.getByRole('button',{name:'Search saved catalog',exact:true}).click();await page.locator('.backup-search-results article').first().waitFor();assert.ok((await page.locator('.backup-search-results article').count())>0)
+  await page.getByRole('button',{name:'Cleanup',exact:true}).click();await page.getByLabel('Cleanup source').selectOption(job.id);await page.getByRole('button',{name:'Build review queue',exact:true}).click();await page.getByRole('heading',{name:'Review candidates · 3 files',exact:true}).waitFor()
+  const clean=await api('overview');const session=clean.cleanups[0];const rows=(await api('details',{kind:'cleanup',id:session.id})).items
+  const report=rows.find(row=>row.source_path.endsWith('report.txt'))
+  await page.locator('.cleanup-list label').filter({hasText:report.source_path}).getByRole('checkbox').check()
+  await page.getByRole('button',{name:'Review selected deletion',exact:true}).click();await page.getByRole('dialog').waitFor();assert.equal((await fs.readdir(source)).length,3)
+  assert.ok(await page.getByRole('button',{name:'Delete verified sources',exact:true}).isDisabled())
+  await page.getByRole('textbox',{name:'Confirm source deletion'}).fill('DELETE');await page.getByRole('button',{name:'Delete verified sources',exact:true}).click()
+  await waitForState(state=>!state.active&&state.cleanups[0]?.deleted_files===1)
+  await assert.rejects(fs.access(report.source_path));assert.ok(await fs.stat(report.proof_path));assert.equal((await fs.readdir(source)).length,2)
+  await page.getByRole('button',{name:'Restore',exact:true}).click();await page.getByLabel('Restore backup session').selectOption(job.id);await page.getByRole('button',{name:'Preview restore plan',exact:true}).click();await page.getByRole('button',{name:'Start verified restore',exact:true}).click()
+  await waitForState(state=>!state.active&&state.restores[0]?.status==='completed')
+  assert.equal(await fs.readFile(path.join(source,'report.txt'),'utf8'),'Verified report contents')
+  console.log('PASS cleanup requires exact reviewed selection + typed confirmation; independent proof retained; safe restore to original path; typo-tolerant backup search')
+  await page.getByRole('navigation',{name:'Backup sections'}).getByRole('button',{name:'Settings',exact:true}).click();await page.getByRole('textbox',{name:'Backup index folder'}).fill(source);await page.getByRole('button',{name:'Start content scan',exact:true}).click()
+  await waitForState(state=>!state.active&&state.tasks.some(task=>task.kind==='index'&&task.state==='completed'))
+  await page.getByRole('navigation',{name:'Backup sections'}).getByRole('button',{name:'Settings',exact:true}).click();await page.getByRole('button',{name:'Create catalog recovery copy',exact:true}).click();await page.getByRole('status').filter({hasText:'Verified catalog recovery copy'}).waitFor()
+  await fs.mkdir(path.join(work,'moved-state'),{recursive:true});await page.getByRole('button',{name:'Move backup state folder',exact:true}).click();await page.getByRole('status').filter({hasText:'Backup state moved'}).waitFor()
+  state=await api('overview');assert.equal(state.jobs[0].id,job.id);assert.equal(state.statePath,path.join(work,'moved-state'));assert.ok(await fs.stat(path.join(work,'backup-state','catalog.sqlite3')))
+  await page.getByRole('button',{name:'Import Disk Backup Manager state',exact:true}).click();await page.getByRole('status').filter({hasText:'Imported a copy'}).waitFor()
+  state=await api('overview');assert.equal(state.jobs[0].id,job.id);assert.notEqual(state.statePath,path.join(work,'moved-state'));assert.ok(await fs.stat(path.join(work,'moved-state','catalog.sqlite3')))
+  await page.reload();await page.getByRole('button',{name:'Backup & protect',exact:true}).click();assert.equal((await api('overview')).jobs[0].id,job.id)
+  await page.setViewportSize({width:400,height:480});await page.waitForTimeout(200)
+  const sidebar=await page.locator('.sidebar').evaluate(element=>({height:element.clientHeight,scroll:element.scrollHeight,bottom:Math.max(...[...element.querySelectorAll('button')].map(button=>button.getBoundingClientRect().bottom))}))
+  assert.equal(sidebar.height,sidebar.scroll,JSON.stringify(sidebar));assert.ok(sidebar.bottom<=480,JSON.stringify(sidebar))
+  const width=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));assert.ok(width.scroll<=width.width+1,JSON.stringify(width))
+  await snapshot('mobile.png');assert.deepEqual(errors,[])
+  console.log('PASS content indexing, catalog recovery, state move retains old folder, copied state import preserves history, refresh persistence, compact sidebar and mobile width; no renderer exceptions')
+} finally {if(app)await app.close()}

@@ -1,0 +1,11 @@
+deepface==0.0.102
+pillow-heif==1.8.0
+rawpy==0.27.0
+pywin32>=306,<400; platform_system == 'Windows'
+rich>=13.7,<15
+imageio-ffmpeg==0.6.0
+psutil==7.2.2
+exifread==3.5.1
+reverse_geocoder==1.5.1
+scipy==1.17.1
+onnxruntime==1.31.0

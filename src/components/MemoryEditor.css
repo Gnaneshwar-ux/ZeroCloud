@@ -1,0 +1,14 @@
+[data-theme] .content .memories-workspace .memory-creative-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:18px;min-width:0;box-sizing:border-box}
+[data-theme] .content .memories-workspace .memory-creative-tools>div{grid-column:1/-1;min-width:0}
+[data-theme] .content .memories-workspace .memory-creative-tools label{display:flex;min-width:0;width:100%;max-width:none;gap:6px}
+[data-theme] .content .memories-workspace .memory-creative-tools select{box-sizing:border-box;width:100%;min-width:0;max-width:100%;font-size:12px;min-height:42px}
+[data-theme] .content .memories-workspace .memory-creative-tools>button{grid-column:1/-1;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;min-height:42px}
+@media(min-width:1100px){[data-theme] .content .memories-workspace .memory-creative-tools{grid-template-columns:repeat(4,minmax(0,1fr));align-items:end}}
+[data-theme] .content .memories-workspace .memory-builder-actions{display:flex;flex-wrap:wrap;gap:10px}
+[data-theme] .content .memories-workspace .memory-builder-actions button{box-sizing:border-box;min-height:44px;flex:1;min-width:0;white-space:normal;overflow-wrap:anywhere;padding:10px;font-size:12px}
+[data-theme] .content .memories-workspace .memory-creative-tools :is(p,strong){overflow-wrap:anywhere}
+.memory-jobs{margin:18px 0;border:1px solid var(--border);border-radius:16px;padding:14px;max-height:260px;overflow:auto}
+.memory-job{display:flex;align-items:center;gap:12px;padding:12px 0;justify-content:space-between}
+.memory-job span{min-width:0;display:grid;gap:4px;overflow-wrap:anywhere}
+.memory-job small{opacity:.75}
+@media(max-width:560px){[data-theme] .content .memories-workspace .memory-creative-tools{grid-template-columns:minmax(0,1fr);padding:14px;gap:12px}}

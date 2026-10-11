@@ -1,0 +1,22 @@
+.viewer-backdrop.immersive-backdrop{padding:0;background:#0c0f14}
+.viewer-backdrop.immersive-backdrop:fullscreen{width:100%;height:100%;margin:0}
+.immersive-viewer .image-canvas video{transform-origin:center;will-change:transform;transition:none!important}
+.viewer.immersive-viewer{position:relative;display:block;width:100%;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0;background:#0c0f14}
+.immersive-viewer .viewer-stage.image-canvas{position:absolute;inset:0;width:100%;height:100%;outline:none}
+.immersive-viewer .viewer-overlay{position:absolute;z-index:3;border:0;background:transparent;min-height:0;margin:0;padding:0;transition:opacity .2s ease,visibility .2s ease;pointer-events:none}
+.immersive-viewer header.viewer-overlay{top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));left:auto}
+.immersive-viewer footer.viewer-overlay{bottom:max(14px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:12px;max-width:calc(100% - 20px);width:max-content;flex-wrap:wrap;justify-content:center}
+.immersive-viewer:has(video) footer.viewer-overlay{bottom:72px}
+.immersive-viewer .viewer-actions,.immersive-viewer .viewer-navigation,.immersive-viewer .zoom-controls{pointer-events:auto;display:flex;align-items:center;border-radius:28px;padding:4px;background:#151b2599;backdrop-filter:blur(12px);box-shadow:0 2px 16px #0002}
+.immersive-viewer .viewer-overlay button{width:40px;height:40px;padding:8px;border-radius:50%;font-size:12px;color:#fff}
+.immersive-viewer .viewer-overlay button:hover{background:#ffffff26}
+.immersive-viewer .viewer-overlay output{color:#fff;font-variant-numeric:tabular-nums}
+.immersive-viewer.controls-hidden .viewer-overlay{opacity:0;visibility:hidden;pointer-events:none}
+.viewer-information{position:absolute;z-index:4;right:max(12px,env(safe-area-inset-right));top:72px;width:min(340px,calc(100% - 24px));max-height:calc(100% - 100px);overflow:auto;box-sizing:border-box;padding:22px;background:#18202bef;backdrop-filter:blur(16px);border:1px solid #ffffff26;border-radius:18px;color:#e8eef7;box-shadow:0 8px 35px #0005}
+.viewer-information>div{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.viewer-information h2{font-size:16px;margin:0}.viewer-information button{display:grid;place-items:center;background:transparent;border:0;color:inherit;width:36px;height:36px;border-radius:50%}
+.viewer-information strong,.viewer-information dd{overflow-wrap:anywhere}.viewer-information dt{font-size:11px;color:#9eb0c8;margin-top:16px}.viewer-information dd{font-size:13px;margin:5px 0;line-height:1.5}.viewer-information p,.viewer-information small{font-size:12px;line-height:1.7;color:#b7c5d8}
+@media(max-width:560px){.immersive-viewer header.viewer-overlay{top:max(8px,env(safe-area-inset-top));right:8px}.immersive-viewer .viewer-overlay button{width:36px;height:36px}.immersive-viewer footer.viewer-overlay{gap:5px}.immersive-viewer .viewer-actions{gap:1px}.immersive-viewer .zoom-controls{gap:0}.viewer-information{padding:16px;top:62px}}
+@media(prefers-reduced-motion:reduce){.immersive-viewer .viewer-overlay{transition:none}}
+.viewer-quick-preview{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
+.viewer-quality-pending{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);padding:6px 12px;background:#101923b3;color:#e3ebf7;border-radius:20px;font-size:11px;pointer-events:none}

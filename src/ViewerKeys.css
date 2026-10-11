@@ -1,0 +1,7 @@
+.viewer-navigation { display: flex; align-items: center; gap: 3px; flex: none; }
+.viewer-navigation output { font-size: 11px; color: #b8c5d7; min-width: 45px; text-align: center; }
+.viewer footer .viewer-navigation button { padding: 6px; }
+.viewer .viewer-actions .viewer-favorite { width: 40px; height: 40px; padding: 8px; justify-content: center; }
+.viewer .viewer-actions .viewer-favorite.is-favorite { color: #ff3040; }
+.viewer .viewer-actions .viewer-favorite.is-favorite svg { fill: currentColor; stroke: currentColor; }
+@media(max-width:560px) { .viewer footer { gap: 5px; } .viewer-navigation output { min-width: 32px; font-size: 10px; } .viewer footer .viewer-navigation button { padding: 3px; width: 26px; } .zoom-controls { gap: 1px; } .viewer footer .zoom-controls button { padding: 4px; font-size: 10px; } }

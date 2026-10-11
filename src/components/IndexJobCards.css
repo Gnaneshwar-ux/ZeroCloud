@@ -1,0 +1,8 @@
+[data-theme] .content .index-job-card{min-width:0;padding:16px;border:1px solid var(--zc-border);border-radius:14px;background:var(--zc-raised);display:flex;flex-direction:column;gap:14px}
+.index-job-heading{display:flex;align-items:flex-start;gap:12px;min-width:0}
+.index-job-heading>svg{flex-shrink:0;margin-top:2px}
+.index-job-heading>span{min-width:0;display:grid;gap:5px}
+.index-job-heading strong{font-size:13px}.index-job-heading small,.index-job-card>small{font-size:12px;line-height:1.5;overflow-wrap:anywhere;color:var(--zc-muted)}
+.index-job-card .button-row{margin:0;gap:8px;flex-wrap:wrap;margin-top:auto}
+[data-theme] .content .index-job-card .button-row button{min-height:40px;padding:8px 12px}
+@media(max-width:560px){[data-theme] .content .index-job-card{padding:14px}.index-job-card .button-row>button{flex:1;white-space:normal;min-width:0}}

@@ -1,0 +1,9 @@
+[data-theme] .content .people-section :is(.people-tools,.people-auto-status,.person-correction-actions,.face-selection)>button,
+[data-theme] .content .people-section .people-show-more{appearance:none;box-sizing:border-box;min-height:40px;padding:9px 14px;border:1px solid var(--zc-border);border-radius:12px;background:var(--zc-raised);color:var(--zc-accent);font-family:inherit;font-weight:600;font-size:13px;line-height:1.4;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:inset 0 1px 0 #ffffff08;transition:background .15s,border-color .15s,transform .15s}
+[data-theme] .content .people-section :is(.people-tools,.people-auto-status,.person-correction-actions,.face-selection)>button:hover:not(:disabled),
+[data-theme] .content .people-section .people-show-more:hover{background:var(--zc-hover);border-color:var(--zc-accent)}
+[data-theme] .content .people-section :is(.people-tools,.people-auto-status,.person-correction-actions,.face-selection)>button:disabled{opacity:.45;cursor:default}
+[data-theme] .content .people-section .people-auto-status>button{background:var(--zc-primary);color:var(--zc-on-primary);border-color:var(--zc-primary);flex-shrink:0}
+[data-theme] .content .people-section .people-tools .me-shortcut img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+[data-theme] .content .compact-people .person-correction-actions>button{min-height:34px;padding:6px 9px;font-size:11px}
+@media(max-width:560px){[data-theme] .content .people-section .people-tools>button{max-width:100%;white-space:normal;overflow-wrap:anywhere}}

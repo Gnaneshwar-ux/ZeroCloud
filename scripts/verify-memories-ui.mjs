@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict'
+import {createRequire} from 'node:module'
+import path from 'node:path'
+const root=process.cwd(),work=process.argv[2]
+const require=createRequire(path.join(root,'package.json')),{_electron:electron}=require('playwright')
+const app=await electron.launch({executablePath:root+'/release/Vela-win-x64-20261010/ZeroCloud.exe',args:[],env:{...process.env,VELA_TEST:'1',VELA_DATA:path.join(work,process.argv[3]||'test-catalog'),VELA_USER_DATA:path.join(work,'test-profile')},timeout:60000})
+try{
+ const page=await app.firstWindow(),errors=[];page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message))
+ await page.getByRole('textbox',{name:'Search media'}).waitFor()
+ await page.getByRole('button',{name:'Memories',exact:true}).click()
+ await page.getByRole('heading',{name:'Memories',exact:true}).waitFor()
+ await page.getByRole('button',{name:'Play memory',exact:true}).first().waitFor()
+ await page.getByRole('button',{name:'Find memories',exact:true}).click()
+ await page.waitForTimeout(400)
+ const count=await page.locator('.memory-card').count();assert.ok(count>0)
+ await page.getByRole('button',{name:'Find memories',exact:true}).click();await page.waitForTimeout(400);assert.equal(await page.locator('.memory-card').count(),count)
+ await page.getByRole('button',{name:'Resume generation',exact:true}).click();await page.getByRole('button',{name:'Pause generation',exact:true}).waitFor()
+ await page.getByRole('button',{name:'Pause generation',exact:true}).click();await page.getByRole('button',{name:'Resume generation',exact:true}).waitFor()
+ await page.getByRole('button',{name:'Play memory',exact:true}).first().click()
+ await page.waitForFunction(()=>document.querySelector('.memory-player video')?.readyState>=2)
+ const duration=await page.locator('.memory-player video').evaluate(v=>v.duration);assert.ok(duration>=11.8,`Reel duration ${duration}`)
+ await page.getByRole('button',{name:'Close memory',exact:true}).click()
+ await page.getByRole('button',{name:'Library',exact:true}).click()
+ await page.getByRole('textbox',{name:'Search media'}).fill('keep-image-a')
+ await page.getByRole('button',{name:'Open keep-image-a.png',exact:true}).click()
+ const heart=page.getByRole('button',{name:'Toggle favorite',exact:true});assert.equal(await heart.textContent(),'')
+ if(await heart.getAttribute('aria-pressed')==='false')await heart.click()
+ await page.waitForFunction(()=>document.querySelector('.viewer-favorite')?.getAttribute('aria-pressed')==='true')
+ assert.equal(await heart.locator('svg').evaluate(e=>getComputedStyle(e).fill),'rgb(255, 48, 64)')
+ await page.getByRole('button',{name:'Close viewer',exact:true}).click()
+ await page.getByRole('button',{name:'Memories',exact:true}).click()
+ await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].showInactive());await page.waitForTimeout(300)
+ await page.screenshot({path:path.join(work,'memories-desktop.png')})
+ await page.setViewportSize({width:400,height:600});await page.screenshot({path:path.join(work,'memories-mobile.png')})
+ assert.deepEqual(errors,[])
+ console.log('PASS: Memories navigation, discovery deduplication, pause/resume, local reel playback, compact favorite heart and no renderer errors.')
+}finally{await app.close()}

@@ -1,0 +1,15 @@
+import { useEffect, useState } from 'react'
+import { desktop } from '../lib/desktop'
+import { Icon } from './Icon'
+type Drive = {path:string;name:string}
+type Directory = {path:string;parent:string|null;entries:Array<{name:string;path:string;directory:boolean;kind:string}>;total:number}
+export function DiskBrowser({onAdd,onError}:{onAdd:(path:string)=>void;onError:(message:string)=>void}) {
+  const [drives,setDrives]=useState<Drive[]>([]),[directory,setDirectory]=useState<Directory>(),[path,setPath]=useState(''),[busy,setBusy]=useState(false)
+  useEffect(()=>{if(desktop)void desktop.request<Drive[]>('listDisks').then(setDrives).catch((error)=>onError(String(error)))},[onError])
+  async function browse(value:string) {
+    setBusy(true)
+    try {const next=await desktop!.request<Directory>('browseDirectory',{path:value});setDirectory(next);setPath(next.path)}
+    catch(error){onError(String(error))}finally{setBusy(false)}
+  }
+  return <section className="disk-section"><div className="section-heading"><div><h2>Disks & folders</h2><p>Explore your drives, then index all media in a disk or folder.</p></div></div>{!desktop?<div className="settings-card"><h3>Use the ZeroCloud desktop app to browse disks</h3><p>A standalone browser page can only access folders you grant it.</p></div>:<><div className="drive-list">{drives.map((drive)=><button key={drive.path} disabled={busy} onClick={()=>void browse(drive.path)}><Icon name="storage"/><strong>{drive.name}</strong><small>{drive.path}</small></button>)}</div><form className="disk-path" onSubmit={(event)=>{event.preventDefault();void browse(path)}}><input aria-label="Disk or folder path" placeholder="Choose a disk, or enter a folder path" value={path} onChange={(event)=>setPath(event.target.value)}/><button disabled={busy||!path}>Open path</button></form>{directory&&<><div className="disk-toolbar"><button disabled={busy||!directory.parent} onClick={()=>directory.parent&&void browse(directory.parent)}>↑ Parent folder</button><span>{directory.total.toLocaleString()} entries</span><button className="primary-action" disabled={busy} onClick={()=>onAdd(directory.path)}>Index {directory.parent?'this folder':'entire disk'}</button></div><p className="folder-help">A whole-disk scan runs in the background and can be stopped and resumed. Hidden system and app-cache folders are skipped. Originals stay in place. You can optionally keep a portable cache on the same drive.</p><div className="disk-entries">{directory.entries.map((entry)=><button key={entry.path} disabled={busy||!entry.directory} onClick={()=>void browse(entry.path)} title={entry.path}><Icon name={entry.directory?'folders':entry.kind==='video'?'video':'image'}/><span>{entry.name}</span><small>{entry.directory?'Folder':entry.kind}</small>{entry.directory&&<Icon name="chevron" size={14}/>}</button>)}</div>{directory.total>directory.entries.length&&<p className="folder-help">Showing the first {directory.entries.length} entries. Indexing processes the entire folder, not just the displayed list.</p>}</>}{busy&&<p role="status">Reading folder…</p>}</>}</section>
+}

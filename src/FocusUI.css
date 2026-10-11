@@ -1,0 +1,113 @@
+/* Content-first layout. Processing details live in Settings, not above each tab. */
+.app-shell { grid-template-columns: 224px minmax(0, 1fr); }
+.app-shell .sidebar { padding: 14px 12px; }
+.sidebar .brand-row { height: 36px; min-height: 36px; margin: 0 7px 14px; }
+.sidebar .brand-row .brand-name { font-size: 19px; }
+.sidebar .brand-icon { width: 27px; height: 27px; }
+.sidebar .sidebar-toggle { display: grid; width: 28px; height: 28px; }
+.sidebar .add-source { min-height: 40px; margin: 0 0 12px; border-radius: 11px; }
+.sidebar nav { flex: none; display: flex; flex-direction: column; gap: 9px; }
+.sidebar .nav-group { display: flex; flex-direction: column; gap: 2px; }
+.sidebar .nav-label { display: block; text-transform: uppercase; margin: 0 12px 4px; font-size: 9px; letter-spacing: 1.2px; }
+.sidebar .nav-item { min-height: 34px; height: 34px; width: 100%; padding: 0 12px; gap: 11px; border-radius: 9px; font-size: 12px; }
+.sidebar .nav-icon { width: 20px; }
+.sidebar .nav-icon svg { width: 19px; height: 19px; }
+.sidebar .sidebar-footer { margin: 12px 0 0; padding: 9px 0 0; }
+.sidebar .sidebar-footer > small { display: block; margin: 8px 12px 0; font-size: 9px; }
+.rail-collapsed.app-shell { grid-template-columns: 68px minmax(0, 1fr); }
+.rail-collapsed .sidebar { padding: 12px 9px; }
+.rail-collapsed .sidebar .brand-row { height: 58px; min-height: 58px; margin: 0 0 10px; align-items: flex-end; }
+.rail-collapsed .sidebar .brand-row .brand { height: 28px; }
+.rail-collapsed .sidebar .sidebar-toggle { top: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 24px; }
+.rail-collapsed .sidebar .brand-icon { width: 25px; height: 25px; }
+.rail-collapsed .sidebar .nav-label { display: none; }
+.rail-collapsed .sidebar .nav-item { padding: 0; justify-content: center; min-height: 34px; height: 34px; }
+.rail-collapsed .sidebar .nav-group + .nav-group { padding-top: 8px; border-top: 1px solid #edf0f5; }
+.rail-collapsed .sidebar nav { gap: 8px; }
+.rail-collapsed .sidebar .sidebar-footer > small { display: none; }
+.topbar { box-sizing: border-box; height: 72px; padding: 14px 30px; gap: 16px; }
+.topbar .searchbox { max-width: 680px; }
+.activity-chip { display: inline-flex; align-items: center; gap: 7px; flex: none; padding: 8px 10px; border: 1px solid #e1e8f0; border-radius: 20px; background: #fff; color: #63758a; font-size: 11px; }
+.activity-chip:hover { background: #edf4ff; border-color: #bdd2ee; }
+.activity-dot { width: 6px; height: 6px; border-radius: 50%; background: #5ca47b; flex: none; }
+.activity-chip.working .activity-dot { animation: pulse 1.8s infinite; }
+.activity-chip.attention .activity-dot { background: #bc8b3f; }
+.activity-chip.stopped .activity-dot { background: #8b98a8; animation: none; }
+.content > .library-toolbar { padding-top: 0; margin: 22px 30px 0; }
+.content .library-section, .content .people-section, .content .folder-section, .content .disk-section, .content .places-section { padding-left: 30px; padding-right: 30px; }
+.content .people-section, .content .folder-section, .content .disk-section, .content .places-section { padding-top: 24px; }
+.settings-workspace { padding: 24px 30px 40px; }
+.settings-heading h1 { margin: 0; font-size: 25px; letter-spacing: -.6px; color: #26384a; }
+.settings-heading p { margin: 8px 0 20px; color: #7b8c9f; font-size: 12px; }
+.settings-tabs { display: flex; gap: 22px; border-bottom: 1px solid #dee6f0; margin-bottom: 24px; }
+.settings-tabs button { padding: 10px 0 13px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: #6c7d91; font-size: 12px; font-weight: 600; }
+.settings-tabs button[aria-selected="true"] { color: #2468b7; border-bottom-color: #347bd0; }
+.settings-workspace .settings-section { padding: 0; }
+.activity-panel { max-width: 1160px; }
+.activity-panel .section-heading { margin-bottom: 18px; }
+.activity-panel .stats-grid { padding: 0; gap: 14px; margin-bottom: 18px; }
+.activity-panel .stats-grid article { min-height: 100px; padding: 20px; gap: 16px; }
+.activity-panel .stats-grid strong { font-size: 24px; }
+.activity-panel .stat-icon { width: 42px; height: 42px; }
+.activity-panel .job-panel { margin: 0 0 18px; padding: 16px 18px; }
+.activity-panel .indexing-controls { margin: 0; padding: 18px; }
+.activity-panel .stats-grid span { font-size: 11px; }
+.person-filter { margin-top: 16px; }
+.sidebar button:focus-visible, .activity-chip:focus-visible, .settings-tabs button:focus-visible { outline: 2px solid #347bd0; outline-offset: 2px; }
+@media (max-height: 700px) {
+  .sidebar .nav-item, .rail-collapsed .sidebar .nav-item { min-height: 30px; height: 30px; }
+  .sidebar .nav-label { display: none; }
+  .sidebar .nav-group + .nav-group { border-top: 1px solid #edf0f5; padding-top: 6px; }
+  .sidebar nav, .rail-collapsed .sidebar nav { gap: 6px; }
+  .sidebar .sidebar-footer > small { display: none; }
+}
+@media (max-height: 580px) {
+  .app-shell .sidebar { padding-top: 8px; padding-bottom: 8px; }
+  .sidebar .brand-row { margin-bottom: 8px; height: 30px; min-height: 30px; }
+  .rail-collapsed .sidebar .brand-row { height: 44px; min-height: 44px; margin-bottom: 6px; }
+  .rail-collapsed .sidebar .brand-row .brand { height: 22px; }
+  .rail-collapsed .sidebar .brand-icon { width: 21px; height: 21px; }
+  .rail-collapsed .sidebar .sidebar-toggle { height: 20px; width: 20px; }
+  .sidebar .add-source { min-height: 32px; margin-bottom: 7px; }
+  .sidebar .nav-item, .rail-collapsed .sidebar .nav-item { min-height: 27px; height: 27px; font-size: 11px; }
+  .sidebar .nav-group { gap: 1px; }
+  .sidebar .nav-group + .nav-group, .rail-collapsed .sidebar .nav-group + .nav-group { padding-top: 4px; }
+  .sidebar nav, .rail-collapsed .sidebar nav { gap: 4px; }
+  .sidebar .sidebar-footer { margin-top: 7px; padding-top: 5px; }
+}
+@media (max-width: 850px) {
+  .topbar { padding-left: 16px; padding-right: 16px; gap: 8px; }
+  .topbar .local-badge { display: none; }
+  .settings-workspace { padding: 22px 16px 32px; }
+  .content .library-section, .content .people-section, .content .folder-section, .content .disk-section, .content .places-section { padding-left: 16px; padding-right: 16px; }
+  .activity-panel .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+  .activity-panel .stats-grid article { min-height: 70px; padding: 14px; }
+}
+@media (max-width: 560px) {
+  .app-shell { grid-template-columns: 60px minmax(0, 1fr); }
+  .rail-collapsed.app-shell { grid-template-columns: 60px minmax(0, 1fr); }
+  .app-shell:not(.rail-collapsed) .sidebar { position: fixed; width: 224px; z-index: 15; box-shadow: 8px 0 24px #26384a18; }
+  .app-shell:not(.rail-collapsed) .content { grid-column: 2; }
+  .app-shell .sidebar { padding-left: 8px; padding-right: 8px; }
+  .sidebar .brand-row { align-items: center; justify-content: space-between; }
+  .sidebar .brand-row .brand { height: auto; justify-content: flex-start; }
+  .sidebar .brand-name, .sidebar .nav-item > span:last-child, .sidebar .add-label { display: inline !important; }
+  .sidebar .sidebar-toggle { position: static; transform: none; flex: none; }
+  .sidebar .nav-item { justify-content: flex-start; }
+  .sidebar .brand-icon { display: block; }
+  .sidebar .sidebar-footer { margin-top: 8px; }
+  .rail-collapsed .sidebar .brand-row { align-items: flex-end; justify-content: center; }
+  .rail-collapsed .sidebar .brand-row .brand { justify-content: center; }
+  .rail-collapsed .sidebar .sidebar-toggle { position: absolute; }
+  .rail-collapsed .sidebar .brand-name, .rail-collapsed .sidebar .nav-item > span:last-child, .rail-collapsed .sidebar .add-label { display: none !important; }
+  .rail-collapsed .sidebar .nav-item { justify-content: center; }
+  .topbar { height: 66px; }
+  .activity-chip { padding: 9px; }
+  .activity-chip > span:not(.activity-dot), .activity-chip > svg { display: none; }
+  .activity-dot { width: 8px; height: 8px; }
+  .settings-tabs { gap: 14px; }
+  .settings-tabs button { font-size: 11px; }
+  .activity-panel .job-panel { flex-wrap: wrap; }
+  .activity-panel .job-panel small { display: block; }
+  .content > .library-toolbar { margin-left: 16px; margin-right: 16px; }
+}

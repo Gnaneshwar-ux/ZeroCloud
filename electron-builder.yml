@@ -1,0 +1,24 @@
+appId: com.local.zerocloud
+productName: ZeroCloud
+directories:
+  output: release/installers
+artifactName: ZeroCloud-Setup-${version}-${arch}.${ext}
+compression: maximum
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: public/zerocloud.ico
+  signAndEditExecutable: false
+  executableName: ZeroCloud
+nsis:
+  oneClick: false
+  perMachine: false
+  allowElevation: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: ZeroCloud
+  installerIcon: public/zerocloud.ico
+  uninstallerIcon: public/zerocloud.ico
+  deleteAppDataOnUninstall: false
