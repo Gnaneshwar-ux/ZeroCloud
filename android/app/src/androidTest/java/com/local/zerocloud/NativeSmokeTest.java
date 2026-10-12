@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 /** Synthetic test media only; never loads the developer's media library. */
 @RunWith(AndroidJUnit4.class) public class NativeSmokeTest {
  Context context;Catalog db;
- @Before public void setup(){context=InstrumentationRegistry.getInstrumentation().getTargetContext();db=Catalog.get(context);db.setting("paused","false");}
+ @Before public void setup(){context=InstrumentationRegistry.getInstrumentation().getTargetContext();db=Catalog.get(context);db.setSetting("paused","false");}
  @Test public void sqlitePersistsFavoriteAndSource()throws Exception{
    String id=Catalog.uuid();db.getWritableDatabase().execSQL("INSERT INTO folders(id,uri,name,scan) VALUES(?,?,?,0)",new Object[]{id,"content://test/"+id,"Synthetic source"});
    assertTrue(db.folders().toString().contains(id));db.request("pause",new JSONObject().put("paused",true));assertTrue(db.status().getBoolean("paused"));db.request("pause",new JSONObject().put("paused",false));

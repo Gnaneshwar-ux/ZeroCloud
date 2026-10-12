@@ -55,7 +55,7 @@ public final class Catalog extends SQLiteOpenHelper {
     }
     @Override public void onUpgrade(SQLiteDatabase d,int from,int to){throw new IllegalStateException("Unsupported catalog upgrade; existing data has not been changed.");}
     String setting(String key,String fallback){try(Cursor c=getReadableDatabase().rawQuery("SELECT value FROM settings WHERE key=?",new String[]{key})){return c.moveToFirst()?c.getString(0):fallback;}}
-    void setting(String key,String value){ContentValues v=new ContentValues();v.put("key",key);v.put("value",value);getWritableDatabase().insertWithOnConflict("settings",null,v,SQLiteDatabase.CONFLICT_REPLACE);}
+    void setSetting(String key,String value){ContentValues v=new ContentValues();v.put("key",key);v.put("value",value);getWritableDatabase().insertWithOnConflict("settings",null,v,SQLiteDatabase.CONFLICT_REPLACE);}
     boolean paused(){return setting("paused","false").equals("true");}
     public void schedule(){WorkManager.getInstance(context).enqueueUniqueWork("zerocloud-index",ExistingWorkPolicy.APPEND_OR_REPLACE,new OneTimeWorkRequest.Builder(IndexWorker.class).build());}
     static JSONObject object(Object...args)throws Exception{JSONObject o=new JSONObject();for(int i=0;i<args.length;i+=2)o.put((String)args[i],args[i+1]==null?JSONObject.NULL:args[i+1]);return o;}
@@ -68,7 +68,7 @@ public final class Catalog extends SQLiteOpenHelper {
         switch(op){
             case "load":return load(a);
             case "status":return status();
-            case "pause":setting("paused",String.valueOf(a.optBoolean("paused")));if(!paused())schedule();return status();
+            case "pause":setSetting("paused",String.valueOf(a.optBoolean("paused")));if(!paused())schedule();return status();
             case "viewing":viewing=a.optBoolean("value");return true;
             case "priority":{JSONArray ids=a.optJSONArray("ids");if(ids!=null)for(int i=0;i<ids.length();i++)priority.add(ids.getString(i));return true;}
             case "favorite":{getWritableDatabase().execSQL("UPDATE media SET favorite=? WHERE id=?",new Object[]{a.optBoolean("value")?1:0,a.getString("id")});return true;}
@@ -85,7 +85,7 @@ public final class Catalog extends SQLiteOpenHelper {
             case "locations":return locations();
             case "delete":return delete(a);
             case "storage":return storage();
-            case "cacheBudget":{int mb=a.optInt("mb",256);if(mb<64||mb>1024)throw new Exception("Cache budget must be 64–1024 MB.");setting("cacheMB",String.valueOf(mb));trimCache();return storage();}
+            case "cacheBudget":{int mb=a.optInt("mb",256);if(mb<64||mb>1024)throw new Exception("Cache budget must be 64–1024 MB.");setSetting("cacheMB",String.valueOf(mb));trimCache();return storage();}
             case "portableSync":exportPortable();return true;
             case "detachFolder":getWritableDatabase().execSQL("UPDATE folders SET online=0 WHERE id=?",new Object[]{a.getString("id")});return true;
             case "memoryOptions":return memoryOptions();
@@ -106,9 +106,9 @@ public final class Catalog extends SQLiteOpenHelper {
             }
             case "chooseCache":{
                 DocumentFile tree=DocumentFile.fromTreeUri(context,uri);if(tree==null||!tree.canWrite())throw new Exception("Select a writable cache folder.");
-                String source=args==null?"":args.optString("folder");if(source.isEmpty())setting("portableCache",uri.toString());else getWritableDatabase().execSQL("UPDATE folders SET cache=? WHERE id=?",new Object[]{uri.toString(),source});return true;
+                String source=args==null?"":args.optString("folder");if(source.isEmpty())setSetting("portableCache",uri.toString());else getWritableDatabase().execSQL("UPDATE folders SET cache=? WHERE id=?",new Object[]{uri.toString(),source});return true;
             }
-            case "chooseBackup":setting("backupDestination",uri.toString());return true;
+            case "chooseBackup":setSetting("backupDestination",uri.toString());return true;
             case "exportWorkspace":try(OutputStream out=context.getContentResolver().openOutputStream(uri,"wt")){if(out==null)throw new Exception("Cannot write workspace.");out.write(workspace().toString().getBytes(StandardCharsets.UTF_8));}return true;
             case "importWorkspace":{try(InputStream in=context.getContentResolver().openInputStream(uri)){JSONObject doc=new JSONObject(readText(in,8_000_000));if(!doc.optString("format").equals("zerocloud-android-workspace")||doc.optInt("version")!=1)throw new Exception("Choose a supported Android workspace export. Windows workspaces require a separate import adapter.");JSONArray list=doc.getJSONArray("folders");if(list.length()>200)throw new Exception("Too many folders in workspace.");for(int i=0;i<list.length();i++){JSONObject f=list.getJSONObject(i);Uri root=Uri.parse(f.getString("uri"));if(!"content".equals(root.getScheme()))throw new Exception("Invalid folder URI.");DocumentFile tree=DocumentFile.fromTreeUri(context,root);ContentValues v=new ContentValues();v.put("id",f.getString("id"));v.put("uri",root.toString());v.put("name",f.optString("name","Folder"));v.put("cache",f.optString("cache"));v.put("online",tree!=null&&tree.canRead()?1:0);v.put("scan",1);getWritableDatabase().insertWithOnConflict("folders",null,v,SQLiteDatabase.CONFLICT_IGNORE);}schedule();return true;}}
             default:throw new Exception("Unknown file picker operation.");
