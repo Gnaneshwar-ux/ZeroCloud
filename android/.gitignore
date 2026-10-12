@@ -1,0 +1,7 @@
+.gradle/
+**/build/
+local.properties
+app/src/main/assets/models/
+app/src/main/assets/land.json
+*.jks
+*.keystore
